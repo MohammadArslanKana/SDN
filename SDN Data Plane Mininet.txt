@@ -1,0 +1,89 @@
+┌──────────────────────────┐
+│   SDN Data Plane         │
+│  (Mininet / Switches)    │
+└───────────┬──────────────┘
+            │
+                    ▼
+┌──────────────────────────┐
+│ Feature Extraction Layer │
+│ (1s Time Window, Stats)  │
+└───────────┬──────────────┘
+            │
+                    ▼
+┌──────────────────────────┐
+│ CNN – Fast Sensor        │  ← ALWAYS RUNS
+│ - Traffic morphology     │
+│ - Burst detection        │
+│ - Anomaly score          │
+└───────────┬──────────────┘
+            │
+     ┌──────┴─────────┐
+     │ Decision Gate  │
+     │ (Confidence)   │
+     └──────┬─────────┘
+            │
+   ┌────────┴─────────┐
+   │                  │
+     ▼                             ▼
+┌──────────────┐   ┌──────────────┐
+│ Transformer  │   │ GNN           │
+│ Temporal     │   │ Spatial       │
+│ Reasoner     │   │ Reasoner      │
+│ (History)    │   │ (Topology)    │
+└──────┬───────┘   └──────┬───────┘
+       │                  │
+       └────────┬─────────┘
+                          ▼
+     ┌──────────────────────────┐
+     │ Fusion / Decision Engine │
+     │ - Final class            │
+     │ - Confidence             │
+     └──────────────────────────┘
+
+
+
+
+
+SELECTED_FEATURES = [
+    # Flow / packet dynamics
+    "disp_pakt",
+    "disp_byte",
+    "mean_pkt",
+    "mean_byte",
+
+    # Flow behavior
+    "avg_durat",
+    "avg_flow_dst",
+
+    # Rate-based features (VERY important)
+    "rate_pkt_in",
+    "disp_interval",
+
+    # Network / switch context
+    "switch_id",
+
+    # Label (always kept)
+    "label"
+]
+
+
+
+OPTIONAL_FEATURES = [
+    "flow_count",  #controller workload
+    "unique_src_ip",  #spoofing & distribution
+    "unique_dst_ip",  #scanning & amplification
+    "packet_in_count"  #direct controller stress
+]
+
+
+
+| Attack Type            | Covered by                |
+| ---------------------- | ------------------------- |
+| SYN / UDP / ICMP Flood | rate + dispersion         |
+| Packet_in Flood        | rate_pkt_in               |
+| LOFT                   | disp_interval + avg_durat |
+| Flow Table Exhaustion  | avg_flow_dst + avg_durat  |
+| Distributed DDoS       | switch_id + rate          |
+| Topology Poisoning     | distribution anomalies    |
+| NB / SB abuse          | rate + flow_count         |
+
