@@ -37,7 +37,49 @@ Fusion MLP
    ↓
 Final Decision + Mitigation
 ```
-
+```
+┌──────────────────────────┐
+│   SDN Data Plane         │
+│  (Mininet / Switches)    │
+└───────────┬──────────────┘
+            │
+            ▼
+┌──────────────────────────┐
+│ Feature Extraction Layer │
+│ (1s Time Window, Stats)  │
+└───────────┬──────────────┘
+            │
+            ▼
+┌──────────────────────────┐
+│ CNN – Fast Sensor        │  ← ALWAYS RUNS
+│ - Traffic morphology     │
+│ - Burst detection        │
+│ - Anomaly score          │
+└───────────┬──────────────┘
+            │
+     ┌──────┴─────────┐
+     │ Decision Gate  │
+     │ (Confidence)   │
+     └──────┬─────────┘
+            │
+   ┌────────┴─────────┐
+   │                  │
+   ▼                  ▼
+┌──────────────┐   ┌──────────────┐
+│ Transformer  │   │ GNN           │
+│ Temporal     │   │ Spatial       │
+│ Reasoner     │   │ Reasoner      │
+│ (History)    │   │ (Topology)    │
+└──────┬───────┘   └──────┬───────┘
+       │                  │
+       └────────┬─────────┘
+                ▼
+     ┌──────────────────────────┐
+     │ Fusion / Decision Engine │
+     │ - Final class            │
+     │ - Confidence             │
+     └──────────────────────────┘
+```
 ---
 
 # 3️⃣ Data Plane & Feature Layer
