@@ -1,28 +1,3 @@
-Perfect. Now we formalize everything properly.
-
-What I’m giving you below is a **clean, document-ready technical architecture specification** for your project.
-
-You can paste this into:
-
-* Your thesis
-* Your GitHub README
-* Your design document
-* Your project proposal
-
-This includes:
-
-* System objective
-* Module responsibilities
-* Locked architectural decisions
-* Latency constraints
-* Data requirements
-* Training strategy
-* Deployment strategy
-
----
-
-# 📘 Project Title
-
 **Hierarchical Role-Based Ensemble IDS for SDN Environments**
 
 ---
