@@ -390,17 +390,3 @@ No redesign required.
 * Attack-agnostic feature design
 
 ---
-
-# 15️⃣ Copy-Paste Context Block (Short Version)
-
-We are implementing a hierarchical role-based ensemble IDS for SDN. A lightweight CNN runs continuously on 2-second windows to produce binary confidence, rough multi-class logits, and embeddings. A decision gate activates deeper reasoning when needed. A Transformer analyzes 20 seconds of CNN embeddings for temporal persistence. A GNN analyzes topology-based coordination using per-switch embeddings. A small Fusion MLP combines all outputs to produce final attack classification. The system is trained offline and deployed in real time with latency target under 30ms.
-
----
-
-You now have a fully structured, document-ready architecture.
-
-Next step:
-
-Do you want to design the training pipeline for the full stacked system?
-
-Or do you want to implement Transformer module next?
