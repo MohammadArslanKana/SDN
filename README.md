@@ -89,37 +89,34 @@ Final Decision + Mitigation
 * Mininet switches
 * SDN controller (e.g., Ryu)
 * Real-time flow statistics
-
+```
 ## 3.2 Feature Extraction (1-second window)
 
-Extracted features (attack-agnostic morphology features):
+packet_in_count
+packet_in_rate
+flow_mod_count
+flow_removed_count
+flow_table_size
+flow_table_utilization_ratio
+flow_entry_growth_rate
+packet_in_to_flow_mod_ratio
+unique_src_ip
+unique_dst_ip
+src_ip_entropy
+dst_ip_entropy
+tcp_syn_count
+udp_packet_count
+arp_packet_count
+icmp_packet_count
+avg_flow_duration
+short_flow_ratio
+packet_in_variance
+burst_score
+switch_id
 
-* disp_pakt
-* disp_byte
-* mean_pkt
-* mean_byte
-* avg_durat
-* avg_flow_dst
-* rate_pkt_in
-* disp_interval
-* switch_id
-* flow_count
-* unique_src_ip
-* unique_dst_ip
-* packet_in_count
-
-These features describe:
-
-* Burstiness
-* Flow churn
-* Controller stress
-* Traffic distribution
-* Entropy-like behavior
-
-⚠ Feature set is designed to be attack-agnostic.
 
 ---
-
+```
 # 4️⃣ Stage 1 – CNN Fast Sensor (Locked)
 
 ## 4.1 Purpose
