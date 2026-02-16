@@ -43,27 +43,97 @@
 
 
 
-
+```
 SELECTED_FEATURES = [
-    # Flow / packet dynamics
-    "disp_pakt",
-    "disp_byte",
-    "mean_pkt",
-    "mean_byte",
+    🧠 MASTER FEATURE SET (UNION OF ALL ATTACKS)
 
-    # Flow behavior
-    "avg_durat",
-    "avg_flow_dst",
+You don’t want separate pipelines.
+You want a unified feature vector.
 
-    # Rate-based features (VERY important)
-    "rate_pkt_in",
-    "disp_interval",
+Here is your ideal 2-second feature vector (~35–45 features):
 
-    # Network / switch context
-    "switch_id",
+🧾 Traffic Volume
 
-    # Label (always kept)
-    "label"
+total_packets
+
+total_bytes
+
+packets_per_sec
+
+bytes_per_sec
+
+🌐 Flow Behavior
+
+new_flow_rate
+
+unique_src_ip
+
+unique_dst_ip
+
+entropy_src_ip
+
+entropy_dst_port
+
+flow_add_rate
+
+flow_delete_rate
+
+flow_churn_rate
+
+📦 Control Plane
+
+packet_in_rate
+
+flow_mod_rate
+
+table_miss_rate
+
+packet_in_ratio
+
+controller_cpu
+
+control_channel_bw
+
+🗃 Switch State
+
+flow_table_occupancy
+
+flow_table_utilization_ratio
+
+timeout_events
+
+🧠 Temporal (for CNN to embed)
+
+rate_delta
+
+burst_score
+
+inter_arrival_variance
+
+🗺 Spatial (per switch for GNN)
+
+packet_in_rate_per_switch
+
+table_utilization_per_switch
+
+flow_add_rate_per_switch
+```
+
+🏆 If You Implement These Correctly
+
+Your IDS will:
+
+Detect volumetric DDoS (controller flood)
+
+Detect stealth DDoS (LOFT)
+
+Detect switch exhaustion
+
+Detect ARP poisoning
+
+Detect control-plane abuse
+
+And your architecture (CNN + Transformer + GNN) will actually make sense academically.
 ]
 
 
