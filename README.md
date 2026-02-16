@@ -92,27 +92,72 @@ Final Decision + Mitigation
 
 ## 3.2 Feature Extraction (1-second window)
 ```
+🟢 Control Plane Metrics
+
 packet_in_count
+
 packet_in_rate
+
 flow_mod_count
+
 flow_removed_count
-flow_table_size
-flow_table_utilization_ratio
-flow_entry_growth_rate
+
 packet_in_to_flow_mod_ratio
+
+🟢 Flow Table Metrics
+
+flow_table_size
+
+flow_table_utilization_ratio
+
+flow_entry_growth_rate
+
+🟢 Distribution / Entropy Metrics
+
 unique_src_ip
+
 unique_dst_ip
+
 src_ip_entropy
+
 dst_ip_entropy
+
+🟢 Protocol Counters
+
 tcp_syn_count
+
 udp_packet_count
+
 arp_packet_count
+
 icmp_packet_count
+
+🟢 Flow Behavior
+
 avg_flow_duration
+
 short_flow_ratio
+
+🟢 Temporal / Burst
+
 packet_in_variance
+
 burst_score
+
+🟢 Switch Context (for GNN)
+
 switch_id
+
+##attack types we will do 
+Controller Flooding (Packet_In DDoS)
+
+Flow Table Exhaustion
+
+LOFT (Low-Rate DoS)
+
+ARP Spoof Burst
+
+Control-Plane Reflection Trigger
 ```
 # 4️⃣ Stage 1 – CNN Fast Sensor (Locked)
 
