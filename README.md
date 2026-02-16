@@ -113,9 +113,6 @@ short_flow_ratio
 packet_in_variance
 burst_score
 switch_id
-
-
----
 ```
 # 4️⃣ Stage 1 – CNN Fast Sensor (Locked)
 
