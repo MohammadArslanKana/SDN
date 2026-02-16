@@ -1,0 +1,410 @@
+Perfect.
+Below is your **final, structured, copy-paste system design document**.
+
+This is clean, technical, and ready for:
+
+* Thesis
+* Project documentation
+* GitHub README
+* Design proposal
+* Internal architecture reference
+
+Everything we locked is included.
+
+---
+
+# 📘 Hierarchical Role-Based Ensemble IDS for SDN
+
+---
+
+# 1️⃣ System Objective
+
+Design and implement a **real-time, low-latency, scalable Intrusion Detection System (IDS)** for Software Defined Networks (SDN) that:
+
+* Detects attacks within 2 seconds
+* Identifies attack type
+* Supports multiple SDN control-plane attacks
+* Uses layered reasoning (morphological + temporal + spatial)
+* Maintains worst-case inference latency < 20ms
+* Dynamically adapts to any number of switches
+* Runs real-time on SDN controller (e.g., Ryu)
+
+---
+
+# 2️⃣ Target Attack Set (Locked)
+
+The IDS must detect the following SDN-focused attacks:
+
+1. **Controller Flooding (Packet_In DDoS)**
+2. **Flow Table Exhaustion**
+3. **LOFT (Low-Rate DoS)**
+4. **ARP Spoof Burst**
+5. **Control-Plane Reflection Trigger**
+
+These attacks primarily target the SDN control plane and flow management.
+
+---
+
+# 3️⃣ Feature Extraction Layer
+
+## 3.1 Logging Strategy
+
+* One row per switch per second
+* Timestamp included (for ordering only)
+* switch_id included (for grouping and GNN)
+* Controller-native OpenFlow metrics only
+* No OS-level CPU metrics
+* No hardware-dependent statistics
+
+---
+
+## 3.2 Locked Minimal Feature Set
+
+### 🔹 Control Plane Metrics
+
+* packet_in_count
+* packet_in_rate
+* flow_mod_count
+* flow_removed_count
+* packet_in_to_flow_mod_ratio
+
+### 🔹 Flow Table Metrics
+
+* flow_table_size
+* flow_table_utilization_ratio
+* flow_entry_growth_rate
+
+### 🔹 Distribution / Entropy Metrics
+
+* unique_src_ip
+* unique_dst_ip
+* src_ip_entropy
+* dst_ip_entropy
+
+### 🔹 Protocol Counters
+
+* tcp_syn_count
+* udp_packet_count
+* arp_packet_count
+* icmp_packet_count
+
+### 🔹 Flow Behavior
+
+* avg_flow_duration
+* short_flow_ratio
+
+### 🔹 Temporal / Burst Metrics
+
+* packet_in_variance
+* burst_score
+
+### 🔹 Switch Context
+
+* switch_id
+
+---
+
+# 4️⃣ Data Format
+
+Each row:
+
+```
+timestamp
+switch_id
+<features>
+label
+```
+
+Rules:
+
+* Dataset sorted by timestamp
+* timestamp NOT included in model features
+* switch_id used for grouping and GNN
+* Windows created per switch
+
+---
+
+# 5️⃣ System Architecture Overview
+
+```
+SDN Switches
+      ↓
+Feature Extraction (1s stats)
+      ↓
+Window Manager (2s rolling)
+      ↓
+Stage 1: CNN (Fast Morphology Sensor)
+      ↓
+Decision Gate
+      ↓
+Stage 2A: Transformer (Temporal Reasoner)
+Stage 2B: GNN (Spatial Reasoner)
+      ↓
+Fusion MLP
+      ↓
+Final Attack Classification
+      ↓
+Mitigation
+```
+
+---
+
+# 6️⃣ Unified Window Manager (Core Engine)
+
+Dynamic structure:
+
+```
+cnn_window_buffer[switch_id] = deque(maxlen=2)
+transformer_buffer[switch_id] = deque(maxlen=10)
+```
+
+## Responsibilities
+
+* Maintain rolling 2-second windows per switch
+* Create batched CNN input
+* Store CNN embeddings per switch
+* Maintain 10-embedding history per switch
+* Provide graph snapshot for GNN
+* Work both offline (dataset) and online (Ryu)
+
+System dynamically adapts to:
+
+* 4 switches
+* 15 switches
+* 20 switches
+* Any number of switches
+
+No hardcoding.
+
+---
+
+# 7️⃣ Stage 1 — CNN (Locked Design)
+
+## Purpose
+
+Fast morphology detection.
+
+Always runs.
+
+## Input
+
+2-second window per switch.
+
+Batch shape:
+
+```
+(N_switches, num_features, 2)
+```
+
+## Output
+
+For each switch:
+
+* Binary attack confidence
+* Rough multi-class logits
+* 128-dimensional embedding vector
+
+## Architecture
+
+* 2–3 Conv1D layers
+* BatchNorm
+* GELU/ReLU
+* Embedding layer (128–256 dim)
+* No attention
+* Lightweight
+
+## Performance
+
+* Batched inference
+* GPU-accelerated
+* ~1–3ms per batch
+* ≤5ms guaranteed
+
+---
+
+# 8️⃣ Decision Gate
+
+## Purpose
+
+Determine whether deeper reasoning should influence final decision.
+
+## Input
+
+* CNN binary confidence
+* Confidence threshold
+* Optional anomaly trigger
+
+## Behavior
+
+* Transformer and GNN remain loaded
+* Decision gate controls influence, not execution
+* No cold start allowed
+
+---
+
+# 9️⃣ Stage 2A — Transformer (Temporal Reasoner)
+
+## Input
+
+For each switch:
+
+* Rolling buffer of 10 CNN embeddings
+* Sequence length = 10 (20 seconds)
+
+## Architecture (Locked)
+
+Standard Transformer Encoder
+
+* d_model = 256
+* num_heads = 8
+* num_layers = 2–3
+* feedforward_dim = 512–1024
+* dropout = 0.1
+
+## Output
+
+Per switch:
+
+* Refined multi-class logits
+* Temporal persistence score
+* Optional embedding
+
+## Execution
+
+* Batched across suspicious switches
+* Maintains rolling state
+* No cold start
+
+---
+
+# 🔟 Stage 2B — GNN (Spatial Reasoner)
+
+## Input
+
+At time t:
+
+* Node features = CNN embeddings per switch
+* Edge list = SDN topology
+
+## Architecture
+
+* 2–3 Graph Attention layers
+* Hidden dimension = 256
+* Multi-head attention
+* Residual connections
+
+## Output
+
+* Spatial coordination score
+* Spatial class logits
+
+---
+
+# 1️⃣1️⃣ Fusion Engine (Locked)
+
+Small learned MLP.
+
+## Input Vector
+
+Concatenation of:
+
+* CNN binary confidence
+* CNN logits
+* Transformer logits
+* Transformer persistence score
+* GNN coordination score
+* GNN logits
+
+## Output
+
+* Final multi-class logits
+* Final confidence score
+
+Latency: <1ms
+
+---
+
+# 1️⃣2️⃣ Latency Strategy (Locked)
+
+All models loaded in memory.
+
+Batch processing enabled.
+
+GPU inference enabled.
+
+Rolling buffers eliminate recomputation.
+
+### Expected Worst Case (GPU)
+
+CNN batch: ~2ms
+Transformer: ~5ms
+GNN: ~4ms
+Fusion: ~1ms
+
+Total ≈ 12–15ms
+
+Hard upper bound < 20ms
+
+---
+
+# 1️⃣3️⃣ Scalability Properties
+
+System dynamically adapts to:
+
+* Variable number of switches
+* Variable number of suspicious switches
+* New attack classes
+* New topology size
+
+No architectural redesign required.
+
+---
+
+# 1️⃣4️⃣ Training Strategy
+
+Offline training:
+
+1. Preprocess dataset (sorted by timestamp)
+2. Group by switch_id
+3. Create 2-second windows
+4. Train CNN (binary + multi-class loss)
+5. Generate CNN embeddings
+6. Train Transformer on embedding sequences
+7. Train GNN on graph snapshots
+8. Freeze models
+9. Train Fusion MLP
+
+---
+
+# 1️⃣5️⃣ Deployment Strategy
+
+Live Ryu:
+
+* Feature extraction per switch per second
+* WindowManager updates buffers
+* Batched CNN inference
+* Transformer + GNN update continuously
+* Decision gate controls influence
+* Fusion produces final decision
+* Mitigation triggered
+
+---
+
+# 🔒 Final Locked System Summary
+
+We are building a hierarchical role-based ensemble SDN IDS using controller-native features. A CNN processes 2-second windows per switch and produces embeddings. A Transformer analyzes 20-second embedding history per switch. A GNN analyzes spatial coordination across switches. A small fusion MLP combines all outputs to produce final attack classification. The system is fully dynamic, scalable, GPU-accelerated, and maintains worst-case latency under 20 milliseconds.
+
+---
+
+This is your final architecture document.
+
+We now proceed to implementation phase.
+
+Do you want to:
+
+* Implement Unified WindowManager next?
+* Refactor your preprocessing pipeline?
+* Rebuild CNN using new feature schema?
+* Start writing Transformer module?
+
+Choose direction.
