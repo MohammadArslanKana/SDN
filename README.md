@@ -89,9 +89,9 @@ Final Decision + Mitigation
 * Mininet switches
 * SDN controller (e.g., Ryu)
 * Real-time flow statistics
-```
-## 3.2 Feature Extraction (1-second window)
 
+## 3.2 Feature Extraction (1-second window)
+```
 packet_in_count
 packet_in_rate
 flow_mod_count
