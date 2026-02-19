@@ -398,13 +398,4 @@ We are building a hierarchical role-based ensemble SDN IDS using controller-nati
 
 This is your final architecture document.
 
-We now proceed to implementation phase.
 
-Do you want to:
-
-* Implement Unified WindowManager next?
-* Refactor your preprocessing pipeline?
-* Rebuild CNN using new feature schema?
-* Start writing Transformer module?
-
-Choose direction.
