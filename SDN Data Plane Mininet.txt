@@ -42,15 +42,27 @@
 
 
 
+SDN Switches (Mininet)
+        ↓
+Feature Extraction (1s stats)
+        ↓
+Sliding Window Builder (2s CNN window)
+        ↓
+Stage 1: CNN – Fast Morphology Sensor (ALWAYS RUNS)
+        ↓
+Decision Gate (Confidence + anomaly trigger)
+        ↓
+        ├── Transformer (Temporal reasoning)
+        └── GNN (Spatial reasoning)
+        ↓
+Fusion Engine
+        ↓
+Final Class + Confidence
+        ↓
+Mitigation Module
 
 ```
 SELECTED_FEATURES = [
-    🧠 MASTER FEATURE SET (UNION OF ALL ATTACKS)
-
-You don’t want separate pipelines.
-You want a unified feature vector.
-
-Here is your ideal 2-second feature vector (~35–45 features):
 
 🧾 Traffic Volume
 
@@ -117,7 +129,10 @@ packet_in_rate_per_switch
 table_utilization_per_switch
 
 flow_add_rate_per_switch
+<<<<<<< HEAD
 ```
+=======
+>>>>>>> b060148 (CNN and Transformer)
 
 🏆 If You Implement These Correctly
 
